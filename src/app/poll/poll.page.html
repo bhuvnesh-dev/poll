@@ -1,0 +1,132 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Polls
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="container">
+    <ion-label class="heading">Your Opinion Matters</ion-label>
+    <ion-list *ngIf="!startSpinner">
+      <div class="card" *ngFor="let item of polls; let pollIndex=index;">
+        <div class="header">
+          <div *ngIf="item.poll_enddate !== 'Never' " class="first-row">
+            <ion-label>Date</ion-label>
+            <div class="buttons-container">
+              <ion-buttons class="date">{{ item.poll_enddate==='Never'?"Never" : item?.poll_enddate | date
+                :'fullDate'}}</ion-buttons>
+            </div>
+          </div>
+          <ion-label class="title">{{item.poll_title}}</ion-label>
+          <div class="first-row" style="align-items: center">
+            <ion-label class="question">{{item.poll_question}}</ion-label>
+            <div class="share-button" (click)="sharePoll(item)">
+              <img src="../../assets/share-icon.svg" />
+            </div>
+          </div>
+        </div>
+        <div class="card-container">
+          <div *ngFor="let items of item.options; let i = index;">
+            <ion-buttons class="options" (click)="selectItems(items, items.id, i, polls, pollIndex)">
+              <div class="positive-area"
+                [ngStyle]="{'width.%':items.poll_count>0 && item.showPercentage ?(items.poll_count/item.total_poll_count)*100:0}">
+              </div>
+              <div class="content-row">
+                <div>
+
+                  <img class="icon" *ngIf="item.selectedOption.options_id === items.id"
+                    src="../../assets/icon/checked.svg" />
+                  <img class="icon" *ngIf="item.selectedOption.options_id !== items.id"
+                    src="../../assets/icon/unchecked.svg" />
+                </div>
+                <ion-label class="label">
+                  {{items.poll_option}}
+                </ion-label>
+              </div>
+              <div style="position: absolute; right: 10px">
+                {{item.total_poll_count>0 && item.showPercentage ?
+                setItem((items.poll_count/item.total_poll_count)*100) :0}}%
+              </div>
+              <div></div>
+            </ion-buttons>
+          </div>
+        </div>
+        <ion-buttons *ngIf="item.selectedOption.options_id && item.poll_ans.length<1" class="footer"
+          (click)="submitPoll(item.selectedOption, pollIndex , item)">
+          Submit
+        </ion-buttons>
+        <ion-buttons *ngIf="item.poll_ans.length>0" class="disabled-footer">
+          Already Submitted
+        </ion-buttons>
+        <ion-buttons *ngIf="!item.selectedOption.options_id && item.poll_ans.length<1" class="disabled-footer">
+          Select Option
+        </ion-buttons>
+      </div>
+    </ion-list>
+    <ion-list *ngIf="startSpinner">
+      <div class="card" *ngFor="let item of polls;">
+        <div class="header">
+          <div class="first-row">
+            <ion-skeleton-text [animated]="true"
+              style="height: 20px; width: 80px;  border-radius: 58px"></ion-skeleton-text>
+            <div class="buttons-container">
+              <ion-skeleton-text [animated]="true"
+                style="height: 20px; width: 80px;  border-radius: 58px"></ion-skeleton-text>
+            </div>
+          </div>
+          <ion-skeleton-text [animated]="true"
+            style="height: 20px; width: 50%;  border-radius: 58px"></ion-skeleton-text>
+          <div class="first-row" style="align-items: center">
+            <ion-skeleton-text [animated]="true"
+              style="height: 20px; width: 70%;  border-radius: 58px"></ion-skeleton-text>
+            <div class="share-button">
+              <ion-skeleton-text [animated]="true"
+                style="height: 30px; width: 30px;  border-radius: 58px; margin-top: -20px;"></ion-skeleton-text>
+            </div>
+          </div>
+        </div>
+        <div class="card-container">
+          <div *ngFor="let items of item.options; let i = index;">
+            <ion-skeleton-text [animated]="true"
+              style="height: 50px; width: 100%;  border-radius: 58px; margin-top: 10px;"></ion-skeleton-text>
+          </div>
+        </div>
+        <ion-buttons class="footer">
+          <ion-skeleton-text [animated]="true"
+            style="height: 20px; width: 50%;  border-radius: 5px; "></ion-skeleton-text>
+        </ion-buttons>
+      </div>
+    </ion-list>
+  </div>
+  <ion-alert [isOpen]="alert" header="Alert" subHeader="Important message" message="This is an alert!"
+    [buttons]="alertButtons"></ion-alert>
+</ion-content>
+<div *ngIf="showPopup" class="thankyou-modal">
+  <div class="thankyou">
+    <ion-icon name="close" (click)="closePopup()"></ion-icon>
+    <div class="content">
+      <img src="../../assets/icon/thankyou.svg" style="margin-bottom: 20px" />
+      <ion-label class="label">Thank You</ion-label>
+      <ion-label class="label">Your opinion matters!</ion-label>
+    </div>
+  </div>
+</div>
+<div *ngIf="alertPopup" class="thankyou-modal">
+  <div class="thankyou">
+    <ion-icon name="close" (click)="closePopup()"></ion-icon>
+    <div class="content">
+      <img src="../../assets/icon/error.svg" style="margin-bottom: 20px" />
+      <ion-label class="label">{{popupMessage}}</ion-label>
+    </div>
+  </div>
+</div>
+<div *ngIf="showLoginPopup" class="login-alert">
+  <div class="thankyou">
+    <ion-icon name="close" (click)="closeLoginPopup()"></ion-icon>
+    <div class="content">
+      <ion-label class="label">You must login first to submit a poll</ion-label>
+    </div>
+  </div>
+</div>

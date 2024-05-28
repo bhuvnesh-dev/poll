@@ -1,0 +1,7 @@
+{
+  "name": "poll",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
